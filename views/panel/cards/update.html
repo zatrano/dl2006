@@ -1,0 +1,21 @@
+<!-- Panel Card Update -->
+{{template "layouts/panel" .}}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title mb-0"><strong>{{.Title}}</strong></h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="/panel/cards/update/{{.Card.ID}}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ .CsrfToken }}">
+            <input type="hidden" name="id" value="{{.Card.ID}}">
+            <!-- ... Card update form fields (same as dashboard/cards/update.html) ... -->
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<!-- Panel Invitation Update -->
+{{template "layouts/panel" .}}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title mb-0"><strong>{{.Title}}</strong></h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="/panel/invitations/update/{{.Invitation.ID}}">
+            <input type="hidden" name="csrf_token" value="{{ .CsrfToken }}">
+            <input type="hidden" name="id" value="{{.Invitation.ID}}">
+            <!-- Katılımcılar bölümü kaldırıldı, sadece gösterim/düzenleme/silme için ayrı alan olacak -->
+            <button type="submit" class="btn btn-primary">Güncelle</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

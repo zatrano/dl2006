@@ -1,0 +1,63 @@
+<!--begin::Container-->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title mb-0"><strong>{{.Title}}</strong></h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="/dashboard/invitation-categories/update/{{.Category.ID}}">
+            <input type="hidden" name="csrf_token" value="{{ .CsrfToken }}">
+            <input type="hidden" name="id" value="{{.Category.ID}}">
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Kategori Adı</label>
+                <input type="text" class="form-control" name="name" 
+                       value="{{if .FormData}}{{.FormData.Name}}{{else}}{{.Category.Name}}{{end}}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">İkon (FontAwesome)</label>
+                <input type="text" class="form-control" name="icon" 
+                       value="{{if .FormData}}{{.FormData.Icon}}{{else}}{{.Category.Icon}}{{end}}" required>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Şablon (HTML dosya yolu)</label>
+                <input type="text" class="form-control" name="template" 
+                       value="{{if .FormData}}{{.FormData.Template}}{{else}}{{.Category.Template}}{{end}}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Durum</label>
+                <input type="hidden" name="is_active" value="false">
+                <div class="form-check form-switch mt-2">
+                  <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="true"
+                         {{ if .FormData }}{{ if eq .FormData.IsActive "true" }}checked{{ end }}{{ else }}{{ if .Category.IsActive }}checked{{ end }}{{ end }}>
+                  <label class="form-check-label" for="is_active" id="isActiveLabel">
+                    {{ if .FormData }}{{ if eq .FormData.IsActive "true" }}Aktif{{ else }}Pasif{{ end }}{{ else }}{{ if .Category.IsActive }}Aktif{{ else }}Pasif{{ end }}{{ end }}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+              <a href="/dashboard/invitation-categories" class="btn btn-secondary me-2">İptal</a>
+              <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{define "scripts"}}
+<script>
+  document.getElementById('is_active').addEventListener('change', function() {
+    document.getElementById('isActiveLabel').textContent = this.checked ? 'Aktif' : 'Pasif';
+  });
+</script>
+<!--end::Container-->
+{{end}}

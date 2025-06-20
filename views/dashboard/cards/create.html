@@ -1,0 +1,325 @@
+<!--begin::Container-->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title mb-0"><strong>{{.Title}}</strong></h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="/dashboard/cards/create" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ .CsrfToken }}">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Kart Adı</label>
+                <input type="text" class="form-control" name="name" value="{{if .FormData}}{{.FormData.Name}}{{end}}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Slug</label>
+                <div class="input-group">
+                  <span class="input-group-text">davet.link/@</span>
+                  <input type="text" class="form-control" name="slug_without_at" id="slug_without_at" value="{{if .FormData}}{{.FormData.SlugWithoutAt}}{{end}}" required pattern="[a-zA-Z0-9\-_.]+" title="Sadece harf, rakam, tire (-), alt tire (_) ve nokta (.) kullanabilirsiniz.">
+                  <button type="button" id="check-slug-button" class="btn btn-outline-secondary">Kontrol Et</button>
+                </div>
+                <div id="slug-feedback" class="form-text"></div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Ünvan / Başlık</label>
+                <input type="text" class="form-control" name="title" value="{{if .FormData}}{{.FormData.Title}}{{end}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Profil Fotoğrafı</label>
+                <input type="file" class="form-control" name="profile_picture" id="profile_picture" accept="image/jpeg,image/png,image/jpg,image/gif">
+                <div class="form-text">Maks. 2MB. JPG, PNG, GIF.</div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Telefon</label>
+                <div class="input-group">
+                  <input type="tel" class="form-control" name="phone" id="phone" value="{{if .FormData}}{{.FormData.Phone}}{{end}}" placeholder="0XXXXXXXXXX">
+                  <span class="input-group-text p-0">
+                    <input type="checkbox" id="normalize_phone_checkbox" class="form-check-input ms-2">
+                    <label for="normalize_phone_checkbox" class="ms-1 mb-0 small">Normal</label>
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">E-posta</label>
+                <input type="email" class="form-control" name="email" value="{{if .FormData}}{{.FormData.Email}}{{end}}">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Web Sitesi</label>
+                <input type="url" class="form-control" name="website_url" value="{{if .FormData}}{{.FormData.WebsiteURL}}{{end}}" placeholder="https://....">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Mağaza Linki</label>
+                <input type="url" class="form-control" name="store_url" value="{{if .FormData}}{{.FormData.StoreURL}}{{end}}" placeholder="https://....">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label class="form-label">Konum (Google Haritalar)</label>
+                <div class="input-group mb-2">
+                  <input type="text" class="form-control" id="venue_input" placeholder="Lokasyon Adı (Geçici)">
+                  <input type="text" class="form-control" id="address_input" placeholder="Açık Adres (Geçici)">
+                  <button type="button" class="btn btn-outline-primary" id="generateLocationUrlButton">URL Oluştur</button>
+                  <button type="button" class="btn btn-outline-danger hidden" id="deleteLocationUrlButton">Sil</button>
+                </div>
+                <input type="url" class="form-control bg-light" name="location_url" id="location_url" value="{{if .FormData}}{{.FormData.LocationURL}}{{end}}" readonly placeholder="Mekan/Adres girip URL oluşturun...">
+                <div id="generatedUrlFeedback" class="form-text"></div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label class="form-label">IBAN Bilgileri</label>
+                <div id="iban-rows-container"></div>
+                <button type="button" class="btn btn-light btn-sm mt-2" id="add-iban"><i class="bi bi-plus"></i> Yeni IBAN Ekle</button>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label class="form-label">Sosyal Medya Linkleri</label>
+                <div id="social-rows-container"></div>
+                <button type="button" class="btn btn-light btn-sm mt-2" id="add-social"><i class="bi bi-plus"></i> Yeni Sosyal Medya Ekle</button>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Durum</label>
+                <select class="form-select" name="is_active" required>
+                  <option value="1" {{if eq .FormData.IsActive "1"}}selected{{end}}>Aktif</option>
+                  <option value="0" {{if eq .FormData.IsActive "0"}}selected{{end}}>Pasif</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end">
+              <a href="/dashboard/cards" class="btn btn-secondary me-2">İptal</a>
+              <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--end::Container-->
+{{define "scripts"}}
+<script src="/js/jquery-3.7.1.min.js"></script>
+<script src="/js/jquery.inputmask.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Telefon input mask/normalizasyon
+    const $phoneInput = $('#phone');
+    const $normalizePhoneCheckbox = $('#normalize_phone_checkbox');
+    const phoneMask = "09999999999";
+    const placeholderMasked = "0XXXXXXXXXX";
+    const placeholderNormal = "Örn: +905551234567 veya 5551234567";
+    const strictTRMaskPattern = /^0\d{10}$/;
+    const validNormalPattern = /^\+?\d*$/;
+    const stripCharsForNormalKeepPlusStart = (value) => {
+        if (!value) return "";
+        let val = String(value);
+        if (val.startsWith('+')) {
+            return '+' + val.substring(1).replace(/[^\d]/g, '');
+        }
+        return val.replace(/[^\d]/g, '');
+    };
+    function handleNormalPhoneInput(event) {
+        const input = event.target;
+        let originalValue = input.value;
+        let caretPos = input.selectionStart;
+        let newValue = stripCharsForNormalKeepPlusStart(originalValue);
+        if (originalValue !== newValue) {
+            input.value = newValue;
+            input.setSelectionRange(Math.min(caretPos, newValue.length), Math.min(caretPos, newValue.length));
+        }
+    }
+    function togglePhoneMaskAndBehavior() {
+        if ($normalizePhoneCheckbox.is(':checked')) {
+            $phoneInput.inputmask('remove');
+            $phoneInput.attr('placeholder', placeholderNormal);
+            $phoneInput.on('input.normalPhoneFilter', handleNormalPhoneInput);
+            $phoneInput.val(stripCharsForNormalKeepPlusStart($phoneInput.val()));
+        } else {
+            $phoneInput.off('input.normalPhoneFilter');
+            $phoneInput.inputmask(phoneMask);
+            $phoneInput.attr('placeholder', placeholderMasked);
+        }
+    }
+    const initialPhoneValue = $phoneInput.val() ? String($phoneInput.val()).trim() : "";
+    let setCheckboxChecked = false;
+    if (initialPhoneValue) {
+        if (!strictTRMaskPattern.test(initialPhoneValue)) {
+            setCheckboxChecked = true;
+        }
+    }
+    $normalizePhoneCheckbox.prop('checked', setCheckboxChecked);
+    togglePhoneMaskAndBehavior();
+    $normalizePhoneCheckbox.on('change', function() {
+        togglePhoneMaskAndBehavior();
+    });
+    // Slug kontrol
+    const $slugInput = $('#slug_without_at');
+    const $slugFeedback = $('#slug-feedback');
+    const $checkButton = $('#check-slug-button');
+    let slugDebounceTimer;
+    function clearSlugFeedbackClasses() {
+        $slugFeedback.removeClass('text-red-500 text-green-600 text-blue-600');
+    }
+    function performSlugCheck() {
+        const slugValue = $slugInput.val().trim();
+        clearSlugFeedbackClasses();
+        $slugFeedback.text('');
+        if (!/^[a-zA-Z0-9\-_.]+$/.test(slugValue) && slugValue !== '') {
+            $slugFeedback.text('Geçersiz karakterler.').addClass('text-red-500'); return;
+        }
+        if (slugValue === '') {
+            $slugFeedback.text('Lütfen bir kullanıcı adı girin.').addClass('text-red-500'); return;
+        }
+        if (slugValue.length < 3) {
+             $slugFeedback.text('En az 3 karakter olmalı.').addClass('text-blue-600'); return;
+        }
+        $slugFeedback.text('Kontrol ediliyor...').addClass('text-blue-600');
+        $checkButton.prop('disabled', true);
+        $.getJSON(`https://panel.davet.link/kartvizit/slug-kontrol`, { slug_input: slugValue }, function(data) {
+            clearSlugFeedbackClasses();
+            if (data.is_available) {
+                $slugFeedback.text('Kullanılabilir!').addClass('text-green-600');
+            } else {
+                $slugFeedback.text('Bu kullanıcı adı alınmış.').addClass('text-red-500');
+            }
+            $checkButton.prop('disabled', false);
+        }).fail(function() {
+            clearSlugFeedbackClasses();
+            $slugFeedback.text('Kontrol sırasında bir hata oluştu.').addClass('text-red-500');
+            $checkButton.prop('disabled', false);
+        });
+    }
+    if ($checkButton.length) {
+        $checkButton.on('click', performSlugCheck);
+    }
+    if ($slugInput.length) {
+        $slugInput.on('input', function() {
+             clearTimeout(slugDebounceTimer);
+             clearSlugFeedbackClasses();
+             $slugFeedback.text('');
+        });
+    }
+    // Dinamik IBAN ve sosyal medya satırları
+    function initializeDynamicRows(containerSelector, addButtonSelector, removeButtonSelector, templateHtml, indexPlaceholder, initialIndex) {
+        const $container = $(containerSelector);
+        const $addButton = $(addButtonSelector);
+        let rowIndex = initialIndex;
+        if (!$container.length || !$addButton.length) return;
+        $addButton.on('click', function () {
+            const newRowHtml = templateHtml.replace(new RegExp(indexPlaceholder, 'g'), rowIndex);
+            $container.append(newRowHtml);
+            rowIndex++;
+        });
+        $container.on('click', removeButtonSelector, function () {
+            // Hangi grup olduğunu bul
+            if ($(this).closest('.iban-group').length) {
+                $(this).closest('.iban-group').remove();
+            } else if ($(this).closest('.social-group').length) {
+                $(this).closest('.social-group').remove();
+            }
+        });
+    }
+    let initialIbanIndex = 0;
+    const ibanTemplate = `
+  <div class=\"input-group mb-2 iban-group\">
+    <select name=\"ibans[__IBAN_INDEX__][bank_id]\" class=\"form-select\" style=\"max-width: 180px;\" required>
+      <option value=\"\">Banka Seçiniz</option>
+      {{range .Banks}}<option value=\"{{.ID}}\">{{.Name}}</option>{{end}}
+    </select>
+    <input type=\"text\" name=\"ibans[__IBAN_INDEX__][iban_number]\" class=\"form-control\" placeholder=\"IBAN Numarası\" required>
+    <button type=\"button\" class=\"btn btn-outline-danger remove-row\" tabindex=\"-1\">Sil</button>
+  </div>`;
+    initializeDynamicRows('#iban-rows-container', '#add-iban', '.remove-row', ibanTemplate, '__IBAN_INDEX__', initialIbanIndex);
+    let initialSocialIndex = 0;
+    const socialTemplate = `
+  <div class=\"input-group mb-2 social-group\">
+    <select name=\"social_platforms[__SOCIAL_INDEX__][platform_id]\" class=\"form-select\" style=\"max-width: 180px;\" required>
+      <option value=\"\">Platform Seçiniz</option>
+      {{range .SocialMedias}}<option value=\"{{.ID}}\">{{.Name}}</option>{{end}}
+    </select>
+    <input type=\"url\" name=\"social_platforms[__SOCIAL_INDEX__][link_value]\" class=\"form-control\" placeholder=\"Profil Linki (https://...)\" required>
+    <button type=\"button\" class=\"btn btn-outline-danger remove-row\" tabindex=\"-1\">Sil</button>
+  </div>`;
+    initializeDynamicRows('#social-rows-container', '#add-social', '.remove-row', socialTemplate, '__SOCIAL_INDEX__', initialSocialIndex);
+    // Profil fotoğrafı önizleme
+    $('#profile_picture').on('change', function (evt) {
+        const [file] = this.files;
+        const maxSize = 2 * 1024 * 1024;
+        if (file) {
+            if (file.size > maxSize) {
+                alert('Profil fotoğrafı en fazla 2MB olabilir.');
+                $(this).val('');
+                $('#previewImage').attr('src', '');
+                $('#imageModal').addClass('hidden');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#previewImage').attr('src', e.target.result);
+                $('#imageModal').removeClass('hidden');
+            }
+            reader.readAsDataURL(file);
+        } else {
+             $('#previewImage').attr('src', '');
+        }
+    });
+    $('#changeImage').on('click', function () {
+        $('#profile_picture').val('');
+        $('#previewImage').attr('src', '');
+        $('#imageModal').addClass('hidden');
+    });
+    $('#confirmImage').on('click', function () {
+        $('#imageModal').addClass('hidden');
+    });
+    // Google Maps konum linki üretici
+    const $locationUrlInput = $('#location_url');
+    const $feedbackSpan = $('#generatedUrlFeedback');
+    const $deleteButton = $('#deleteLocationUrlButton');
+    const $generateButton = $('#generateLocationUrlButton');
+    function toggleDeleteButtonVisibility() {
+        if ($locationUrlInput.val() && $locationUrlInput.val().trim() !== '') {
+            $deleteButton.removeClass('hidden');
+        } else {
+            $deleteButton.addClass('hidden');
+        }
+    }
+    $generateButton.on('click', function() {
+        const venue = $('#venue_input').val().trim();
+        const address = $('#address_input').val().trim();
+        if (!venue && !address) {
+            alert('Lütfen URL oluşturmak için Mekan Adı veya Adres girin!');
+            $feedbackSpan.text('').removeClass('text-green-600 text-gray-500');
+            return;
+        }
+        const queryParam = encodeURIComponent(venue + " " + address);
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${queryParam}`;
+        $locationUrlInput.val(mapsUrl);
+        $feedbackSpan.text('Konum URL\'si oluşturuldu/güncellendi.').removeClass('text-gray-500').addClass('text-green-600');
+        toggleDeleteButtonVisibility();
+        setTimeout(() => { $feedbackSpan.text('').removeClass('text-green-600'); }, 5000);
+    });
+    $deleteButton.on('click', function() {
+        if (confirm('Mevcut konum URL\'sini silmek istediğinizden emin misiniz?')) {
+            $locationUrlInput.val('');
+            $feedbackSpan.text('Konum URL\'si silindi.').removeClass('text-green-600').addClass('text-gray-500');
+            toggleDeleteButtonVisibility();
+            $('#venue_input').val('');
+            $('#address_input').val('');
+             setTimeout(() => { $feedbackSpan.text('').removeClass('text-gray-500'); }, 3000);
+        }
+    });
+    toggleDeleteButtonVisibility();
+});
+</script>
+{{end}}

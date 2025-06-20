@@ -1,0 +1,60 @@
+<!-- Panel Card List -->
+{{template "layouts/panel" .}}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0"><strong>{{.Title}}</strong></h3>
+            <div class="float-end">
+              <a href="/panel/cards/create" class="btn btn-sm btn-success">
+                <i class="bi bi-plus-lg"></i> Yeni Ekle
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Kart Adı</th>
+                  <th>Slug</th>
+                  <th>Kullanıcı</th>
+                  <th>Telefon</th>
+                  <th>Durum</th>
+                  <th>İşlemler</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{range $i, $card := .Result.Data}}
+                <tr>
+                  <td>{{$card.ID}}</td>
+                  <td>{{$card.Name}}</td>
+                  <td>{{$card.Slug}}</td>
+                  <td>{{if $card.User}}{{$card.User.Name}}{{end}}</td>
+                  <td>{{$card.Telephone}}</td>
+                  <td>{{if $card.IsActive}}Aktif{{else}}Pasif{{end}}</td>
+                  <td>
+                    <a href="/panel/cards/update/{{$card.ID}}" class="btn btn-sm btn-primary">Düzenle</a>
+                    <form method="POST" action="/panel/cards/delete/{{$card.ID}}" class="d-inline-block" onsubmit="return confirm('Silmek istediğinize emin misiniz?');">
+                      <input type="hidden" name="_method" value="DELETE">
+                      <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+                    </form>
+                  </td>
+                </tr>
+                {{else}}
+                <tr><td colspan="7" class="text-center">Kayıt bulunamadı.</td></tr>
+                {{end}}
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          {{template "partials/pagination.html" .Result.Meta}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

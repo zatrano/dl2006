@@ -1,0 +1,61 @@
+<!-- Panel Invitation List -->
+{{template "layouts/panel" .}}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0"><strong>{{.Title}}</strong></h3>
+            <div class="float-end">
+              <a href="/panel/invitations/create" class="btn btn-sm btn-success">
+                <i class="bi bi-plus-lg"></i> Yeni Ekle
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Başlık</th>
+                  <th>Key</th>
+                  <th>Kategori</th>
+                  <th>Kullanıcı</th>
+                  <th>Tarih</th>
+                  <th>İşlemler</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{range $i, $inv := .Result.Data}}
+                <tr>
+                  <td>{{$inv.ID}}</td>
+                  <td>{{$inv.Title}}</td>
+                  <td>{{$inv.InvitationKey}}</td>
+                  <td>{{if $inv.Category}}{{$inv.Category.Name}}{{end}}</td>
+                  <td>{{if $inv.User}}{{$inv.User.Name}}{{end}}</td>
+                  <td>{{$inv.Date}}</td>
+                  <td>
+                    <a href="/panel/invitations/participants/{{$inv.ID}}" class="btn btn-sm btn-info">Katılımcılar</a>
+                    <a href="/panel/invitations/update/{{$inv.ID}}" class="btn btn-sm btn-primary">Düzenle</a>
+                    <form method="POST" action="/panel/invitations/delete/{{$inv.ID}}" class="d-inline-block" onsubmit="return confirm('Silmek istediğinize emin misiniz?');">
+                      <input type="hidden" name="_method" value="DELETE">
+                      <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+                    </form>
+                  </td>
+                </tr>
+                {{else}}
+                <tr><td colspan="7" class="text-center">Kayıt bulunamadı.</td></tr>
+                {{end}}
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          {{template "partials/pagination.html" .Result.Meta}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
